@@ -1,0 +1,28 @@
+
+/*
+banner
+*/
+ .ck-slide-wrapper {
+     transition: margin-left 0.5s ease; /* 添加平滑过渡效果 */
+     white-space: nowrap; /* 防止li换行 */
+ }
+.ctrl-slide {
+    cursor: pointer;
+    opacity: 0.5; /* 调整初始透明度 */
+    transition: opacity 0.3s;
+}
+.ctrl-slide:hover {
+    opacity: 1;
+}
+ /*
+ 通知通告
+ */
+ #demo3 li {
+     transition: all 0.5s ease;
+ }
+ /*
+ 专题专栏
+ */
+ #thematic-columns td {
+     transition: all 0.5s ease;
+ }

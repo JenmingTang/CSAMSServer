@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.ActivityLocationMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.ActivityLocation">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="approvalStatus" column="approval_status" jdbcType="TINYINT"/>
+            <result property="approverId" column="approver_id" jdbcType="BIGINT"/>
+            <result property="approveTime" column="approve_time" jdbcType="TIMESTAMP"/>
+            <result property="approveReason" column="approve_reason" jdbcType="VARCHAR"/>
+            <result property="deleted" column="is_deleted" jdbcType="TINYINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,description,
+        approval_status,approver_id,approve_time,
+        approve_reason,is_deleted,create_time,
+        update_time
+    </sql>
+    <select id="selectActivityLocationListByParams"
+            resultType="com.future.csamsserver.domain.vo.ActivityLocationVO">
+        select
+        al.id,
+        al.name,
+        al.description,
+        al.approval_status,
+        al.approver_id,
+        al.approve_time,
+        al.approve_reason,
+        al.is_deleted as deleted,
+        al.create_time,
+        al.update_time,
+        u.real_name as approver_name
+        from activity_location al
+        left join user u on u.id = al.approver_id
+        <where>
+            al.is_deleted = 0
+            <if test="createTimeStart != null">
+                and al.create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and al.create_time &lt;= #{createTimeEnd}
+            </if>
+            <if test="name != null and name != ''">
+                and al.name like concat('%', #{name}, '%')
+            </if>
+            <if test="approvalStatus != null">
+                and al.approval_status = #{approvalStatus}
+            </if>
+            <if test="approverName != null and approverName != ''">
+                and u.real_name like concat('%', #{approverName}, '%')
+            </if>
+        </where>
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+    <select id="activityLocationWithActivityEndTimeVO"
+            resultType="com.future.csamsserver.domain.vo.ActivityLocationWithActivityEndTimeVO">
+
+    </select>
+    <select id="activityLocationWithActivityEndTime"
+            resultType="com.future.csamsserver.domain.ActivityLocationWithActivityEndTime">
+        --         select al.name,
+--                a.end_time as activity_end_time
+--         from activity_location al
+--                  left join activity a on a.location = al.name
+--         where al.is_deleted = 0 and al.approval_status = 1
+--         order by a.end_time desc limit 1
+        select al.name,
+               max(a.end_time) as activity_end_time
+        from activity_location al
+                 left join activity a on a.location = al.name
+        where al.is_deleted = 0
+          and al.approval_status = 1
+        and a.approval_status = 1
+        group by al.name
+    </select>
+
+</mapper>

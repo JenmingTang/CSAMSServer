@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.ActivityMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.Activity">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="location" column="location" jdbcType="VARCHAR"/>
+            <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+            <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+            <result property="clubId" column="club_id" jdbcType="BIGINT"/>
+            <result property="approvalStatus" column="approval_status" jdbcType="TINYINT"/>
+            <result property="approverId" column="approver_id" jdbcType="BIGINT"/>
+            <result property="approveTime" column="approve_time" jdbcType="TIMESTAMP"/>
+            <result property="approveReason" column="approve_reason" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,title,content,
+        location,start_time,end_time,
+        club_id,approval_status,approver_id,
+        approve_time,approve_reason,create_time,
+        update_time
+    </sql>
+    <select id="selectActivityListByParams" resultType="com.future.csamsserver.domain.vo.ActivitySAVO">
+            select
+                a.id,
+                a.title,
+                a.content,
+                a.location,
+                a.start_time,
+                a.end_time,
+                a.club_id,
+                a.approval_status,
+                a.approver_id,
+                a.approve_time,
+                a.approve_reason,
+                a.create_time,
+                a.update_time,
+                c.name as club_name,
+                u.real_name as approver_name
+            from activity as a
+            left join club as c on a.club_id = c.id
+            left join user as u on a.approver_id = u.id
+            <where>
+                <if test="createTimeStart != null">
+                    and a.create_time &gt;= #{createTimeStart}
+                </if>
+                <if test="createTimeEnd != null">
+                    and a.create_time &lt;= #{createTimeEnd}
+                </if>
+                <if test="title != null and title != ''">
+                    and a.title like concat('%', #{title}, '%')
+                </if>
+                <if test="clubName != null and clubName != ''">
+                    and c.name like concat('%', #{clubName}, '%')
+                </if>
+                <if test="approvalStatus != null">
+                    and a.approval_status = #{approvalStatus}
+                </if>
+                <if test="approverName != null and approverName != ''">
+                    and u.real_name like concat('%', #{approverName}, '%')
+                </if>
+            </where>
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+    <select id="timeConflictEntity" resultType="com.future.csamsserver.domain.dto.ActivityTimeConflictEntity">
+        SELECT location,start_time,end_time FROM activity
+        WHERE location = #{location}
+        AND approval_status = 1
+        AND NOT (end_time &lt;= #{startTime} OR start_time &gt;= #{endTime});
+
+    </select>
+</mapper>
+        <!--        #   NOT(A OR B)等价于NOT A AND NOT B-->
+        <!--        #   或-->
+        <!--        #   AND end_time > '2025-03-25 18:35:40'新活动在旧活动之后-->
+        <!--        #   AND start_time < '2025-03-26 18:35:41';新活动在旧活动之前-->
+        <!--        #   ===========-->
+        <!--        #     时间轴最远的那一条占用场地的活动-->
+        <!--        #   ORDER BY start_time DESC-->
+        <!--        #     存在一条必然有冲突-->
+        <!--        # LIMIT 1;-->

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.InfoDepartmentMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.InfoDepartment">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="code" column="code" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,code,
+        description,create_time,update_time
+    </sql>
+    <select id="selectInfoDepartmentListByParams" resultType="com.future.csamsserver.domain.InfoDepartment">
+        select
+        <include refid="Base_Column_List"/>
+            from info_department
+        <where>
+            <if test="createTimeStart != null">
+                and create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="code != null and code != ''">
+                and code like concat('%',#{code},'%')
+            </if>
+        </where>
+
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+</mapper>

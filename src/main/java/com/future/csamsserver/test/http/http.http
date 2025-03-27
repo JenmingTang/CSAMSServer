@@ -1,0 +1,79 @@
+### 文件上传测试用例
+POST http://localhost:8080/csams/file/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="a.txt"
+Content-Type: text/plain
+
+< ./a.txt
+
+--WebAppBoundary
+Content-Disposition: form-data; name="targetType"
+
+1
+--WebAppBoundary
+Content-Disposition: form-data; name="targetId"
+
+1001
+--WebAppBoundary
+Content-Disposition: form-data; name="fileCategory"
+
+2
+--WebAppBoundary--
+
+###
+
+
+
+### 异常测试：空文件上传
+POST http://localhost:8080/csams/file/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="empty.txt"
+Content-Type: text/plain
+
+--WebAppBoundary
+Content-Disposition: form-data; name="targetType"
+
+1
+
+--WebAppBoundary
+Content-Disposition: form-data; name="targetId"
+
+1001
+
+--WebAppBoundary
+Content-Disposition: form-data; name="fileCategory"
+
+2
+
+--WebAppBoundary--
+
+### 边界测试：超大文件上传
+POST http://localhost:8080/csams/file/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="large-file.zip"
+Content-Type: application/zip
+
+< ./large-file.zip
+
+--WebAppBoundary
+Content-Disposition: form-data; name="targetType"
+
+1
+
+--WebAppBoundary
+Content-Disposition: form-data; name="targetId"
+
+1001
+
+--WebAppBoundary
+Content-Disposition: form-data; name="fileCategory"
+
+2
+
+--WebAppBoundary--

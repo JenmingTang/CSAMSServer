@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.ClubMemberMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.ClubMember">
+            <id property="userId" column="user_id" jdbcType="BIGINT"/>
+            <id property="clubId" column="club_id" jdbcType="BIGINT"/>
+            <result property="joinTime" column="join_time" jdbcType="TIMESTAMP"/>
+            <result property="approvalStatus" column="approval_status" jdbcType="TINYINT"/>
+            <result property="approverId" column="approver_id" jdbcType="BIGINT"/>
+            <result property="approveTime" column="approve_time" jdbcType="TIMESTAMP"/>
+            <result property="approveReason" column="approve_reason" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_id,club_id,join_time,
+        approval_status,approver_id,approve_time,
+        approve_reason,create_time,update_time
+    </sql>
+    <select id="selectClubMemberListByParams" resultType="com.future.csamsserver.domain.vo.ClubMemberSAVO">
+        select
+            club_member.id,
+            club_member.user_id,
+            club_member.club_id,
+            club_member.join_time,
+            club_member.approval_status,
+            club_member.approver_id,
+            club_member.approve_time,
+            club_member.approve_reason,
+            club_member.create_time,
+            club_member.update_time,
+            club.name as club_name,
+            user.real_name as user_name,
+            u2.real_name as approver_name
+        from club_member
+        left join club on club_member.club_id = club.id
+        left join user on club_member.user_id = user.id
+        left join user as u2 on club_member.approver_id = u2.id
+        <where>
+            <if test="createTimeStart != null">
+                and club_member.create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and club_member.create_time &lt;= #{createTimeEnd}
+            </if>
+            <if test="approvalStatus != null">
+                and club_member.approval_status = #{approvalStatus}
+            </if>
+            <if test="userName != null and userName != ''">
+                and user.username like concat('%',#{userName},'%')
+            </if>
+            <if test="clubName != null and clubName != ''">
+                and club.name like concat('%',#{clubName},'%')
+            </if>
+            <if test="approverName != null and approverName != ''">
+                and u2.username like concat('%',#{approverName},'%')
+            </if>
+        </where>
+
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+</mapper>

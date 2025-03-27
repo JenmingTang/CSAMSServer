@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.RoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.Role">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="roleName" column="role_name" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,role_name,description,
+        create_time,update_time
+    </sql>
+
+    <select id="selectRoleNameByUserId" resultType="java.lang.String">
+        select r.role_name
+        from role r,
+             user_role ur
+        where r.id = ur.role_id
+          and ur.user_id = #{userId}
+    </select>
+    <select id="selectRoleListByParams" resultType="com.future.csamsserver.domain.Role">
+        select
+        <include refid="Base_Column_List"/>
+        from role
+        <where>
+            <if test="roleName != null and roleName != ''">
+                and role_name like concat('%', #{roleName}, '%')
+            </if>
+            <if test="description != null and description != ''">
+                and description like concat('%', #{description}, '%')
+            </if>
+            <if test="createTimeStart != null">
+                and create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+    <select id="selectRoleIdListByUserId" resultType="java.lang.Long">
+            select role_id
+            from user_role
+            where user_id = #{userId}
+    </select>
+</mapper>

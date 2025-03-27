@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.UserRoleMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO user_role (user_id, role_id)
+        VALUES
+        <foreach collection="roleIds" item="roleId" separator=",">
+            (#{userId}, #{roleId})
+        </foreach>
+    </insert>
+
+    <select id="existsById" resultType="boolean">
+        SELECT COUNT(1) FROM user_info WHERE id = #{userId}
+    </select>
+
+    <select id="existsAllById" resultType="boolean">
+        SELECT COUNT(1) = #{size} FROM role_info
+        WHERE id IN
+        <foreach collection="roleIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.ActivityMemberMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.ActivityMember">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="activityId" column="activity_id" jdbcType="BIGINT"/>
+            <result property="joinTime" column="join_time" jdbcType="TIMESTAMP"/>
+            <result property="approvalStatus" column="approval_status" jdbcType="TINYINT"/>
+            <result property="approverId" column="approver_id" jdbcType="BIGINT"/>
+            <result property="approveTime" column="approve_time" jdbcType="TIMESTAMP"/>
+            <result property="approveReason" column="approve_reason" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,activity_id,
+        join_time,approval_status,approver_id,
+        approve_time,approve_reason,create_time,
+        update_time
+    </sql>
+    <select id="selectActivityMemberListByParams"
+            resultType="com.future.csamsserver.domain.vo.ActivityMemberSAVO">
+        select am.id,
+        am.user_id,
+        am.activity_id,
+        am.join_time,
+        am.approval_status,
+        am.approver_id,
+        am.approve_time,
+        am.approve_reason,
+        am.create_time,
+        am.update_time,
+        u.real_name as user_name,
+        a.title as activityName,
+        u2.real_name as approver_name
+        from activity_member as am
+        left join user as u on am.user_id = u.id
+        left join activity as a on am.activity_id = a.id
+        left join user as u2 on am.approver_id = u2.id
+
+        <where>
+            <if test="createTimeStart != null">
+                and am.create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and am.create_time &lt;= #{createTimeEnd}
+            </if>
+            <if test="activityName != null and activityName != ''">
+                and a.title like concat('%', #{activityName}, '%')
+            </if>
+            <if test="joinTime != null">
+                AND am.join_time BETWEEN #{joinTime} - INTERVAL 30 MINUTE
+                AND #{joinTime} + INTERVAL 30 MINUTE
+            </if>
+            <if test="approvalStatus != null">
+                and am.approval_status = #{approvalStatus}
+            </if>
+            <if test="userName != null and userName != ''">
+                and u.real_name like concat('%', #{userName}, '%')
+            </if>
+            <if test="approverName != null and approverName != ''">
+                and u2.real_name like concat('%', #{approverName}, '%')
+            </if>
+        </where>
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+</mapper>

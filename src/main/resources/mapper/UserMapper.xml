@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.User">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="username" column="username" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+            <result property="college" column="college" jdbcType="VARCHAR"/>
+            <result property="major" column="major" jdbcType="VARCHAR"/>
+            <result property="userClass" column="user_class" jdbcType="VARCHAR"/>
+            <result property="email" column="email" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="avatarUrl" column="avatar_url" jdbcType="VARCHAR"/>
+            <result property="enabled" column="is_enabled" jdbcType="TINYINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,username,password,
+        real_name,college,major,
+        user_class,email,phone,
+        avatar_url,is_enabled as enabled,create_time,
+        update_time
+    </sql>
+<!--    配置文件配置了MP框架别名-->
+    <select id="selectUserListByParams" resultType="com.future.csamsserver.domain.User">
+
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        <where>
+            <if test="username != null and username != ''">
+                and username like concat('%', #{username}, '%')
+            </if>
+            <if test="createTimeStart != null">
+                and create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+            <if test="enabled != null">
+                and is_enabled = #{enabled}
+            </if>
+
+            <if test="realName != null and realName != ''">
+                and real_name like concat('%', #{realName}, '%')
+            </if>
+            <if test="college != null and college != ''">
+                and college like concat('%', #{college}, '%')
+            </if>
+            <if test="major != null and major != ''">
+                and major like concat('%', #{major}, '%')
+            </if>
+            <if test="userClass != null and userClass != ''">
+                and user_class like concat('%', #{userClass}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone like concat('%', #{phone}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                and email like concat('%', #{email}, '%')
+            </if>
+        </where>
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+    <select id="selectUserListWithSuperAdminRole" resultType="com.future.csamsserver.domain.User">
+            select
+
+                u.id,
+                u.username,
+                u.password,
+                u.real_name,
+                u.college,
+                u.major,
+                u.user_class,
+                u.email,
+                u.phone,
+                u.avatar_url,
+                u.is_enabled as enabled,
+                u.create_time,
+                u.update_time
+            from user as u
+            left join user_role ur on u.id = ur.user_id
+            left join role r on ur.role_id = r.id
+            where r.role_name = 'SUPER_ADMIN'
+    </select>
+    <select id="selectUserByActivityLocationRole" resultType="com.future.csamsserver.domain.User">
+
+    </select>
+    <select id="selectUserIdByActivityLocationRole" resultType="java.lang.Long">
+        select u.id
+        from user as u
+                 left join user_role ur on u.id = ur.user_id
+                 left join role r on ur.role_id = r.id
+        where r.role_name = 'ACTIVITY_LOCATION'
+    </select>
+    <!--    <select id="selectUserByEmail" resultType="com.future.csamsserver.domain.User">-->
+<!--        select u.id,-->
+<!--               u.username,-->
+<!--               u.password,-->
+<!--               u.real_name,-->
+<!--               u.college,-->
+<!--               u.major,-->
+<!--               u.user_class,-->
+<!--               u.email,-->
+<!--               u.phone,-->
+<!--               u.avatar_url,-->
+<!--               u.is_enabled as enabled,-->
+<!--               u.create_time,-->
+<!--               u.update_time-->
+<!--        from user as u-->
+<!--        where u.email = #{email}-->
+<!--    </select>-->
+</mapper>

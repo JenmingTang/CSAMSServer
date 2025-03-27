@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.ClubMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.Club">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="founderId" column="founder_id" jdbcType="BIGINT"/>
+            <result property="approvalStatus" column="approval_status" jdbcType="TINYINT"/>
+            <result property="approverId" column="approver_id" jdbcType="BIGINT"/>
+            <result property="approveTime" column="approve_time" jdbcType="TIMESTAMP"/>
+            <result property="approveReason" column="approve_reason" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        c.id,
+            c.name,c.description,
+        c.founder_id,c.approval_status,c.approver_id,
+        c.approve_time,c.approve_reason,c.create_time,
+        c.update_time
+    </sql>
+    <select id="selectClubListByParams" resultType="com.future.csamsserver.domain.vo.ClubSAVO">
+        select
+        <include refid="Base_Column_List"/>,
+        u.real_name as founder_name,
+        u2.real_name as approver_name
+        from club c
+        left join user u on c.founder_id = u.id
+        left join user u2 on c.approver_id = u2.id
+        <where>
+            <if test="createTimeStart != null">
+                and c.create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and c.create_time &lt;= #{createTimeEnd}
+            </if>
+            <if test="approvalStatus != null">
+                and c.approval_status = #{approvalStatus}
+            </if>
+            <if test="name != null and name != ''">
+                and c.name like concat('%', #{name}, '%')
+            </if>
+            <if test="approverName != null and approverName != ''">
+                and u2.username like concat('%', #{approverName}, '%')
+            </if>
+<!--            <if test="founderName != null and founderName != ''">-->
+<!--                and u.username like concat('%', #{founderName}, '%')-->
+<!--            </if>-->
+<!--            <if test="approverName != null and approverName != ''">-->
+<!--                and u2.username like concat('%', #{approverName}, '%')-->
+<!--            </if>-->
+        </where>
+
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,123 @@
+spring:
+  jackson:
+    time-zone: Asia/Shanghai  # 按需修改时区
+    date-format: yyyy-MM-dd HH:mm:ss
+  application:
+    name: CSAMSServer
+  main:
+    banner-mode: off
+  ############## openapi 配置 (文档: ) ##############
+
+  datasource:
+    username: csams
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/csams?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  transaction:
+    # 事务超时时间（单位：秒）
+    default-timeout: 30
+    # 资源处理配置
+#  web:
+#    resources:
+#      cache:
+#        period: 3600
+#      chain:
+#        strategy:
+#          content:
+#            enabled: true
+#            paths: /**
+############## openapi 配置 (文档: ) ##############
+logging:
+  file:
+    #    path: logs
+    name: logs/app.log
+  level:
+    com:
+      future:
+        csamsserver:
+          controller: debug
+        # 设置不同包的差异化日志级别
+        mapper: trace
+    org:
+      springframework:
+        web: warn
+    # 设置全局默认日志级别（不指定包时使用）
+    root: info
+  # 输出到文件（配合使用）
+
+#    root debug的话，会一直弹弹弹
+#  level:
+#    root: error
+
+############## openapi 配置 (文档: ) ##############
+#server:
+#  servlet:
+#    context-path: /CSAMS
+############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
+sa-token:
+  # token 名称（同时也是 cookie 名称）
+  token-name: Authorization
+  # token 有效期（单位：秒） 默认30天，-1 代表永久有效
+  timeout: 2592000
+  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
+  active-timeout: -1
+  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
+  is-concurrent: false
+  # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
+  is-share: true
+  # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
+#  token-style: tik 60_vCj8dBGQMb3Asc_RfTwpBaAihLv3KZm__
+  token-style: simple-uuid
+  # 是否输出操作日志
+  is-log: false
+  # token前缀
+  token-prefix: Bearer
+
+############## openapi 配置 (文档: ) ##############
+springdoc:
+  #  swagger-ui:
+  #    path: /swagger-ui.html
+  #    path: /api.html
+  api-docs:
+    #    访问地址：/api-docs.yaml得到yaml格式的文档
+    path: /api-docs
+############## openapi 配置 (文档: ) ##############
+oss:
+  endpoint: https://oss-cn-guangzhou.aliyuncs.com
+  accessKeyId: LTAI5tAL8KoqoFHfJxZDEKe2
+  accessKeySecret: w3RoGNQCWqxbQXa86bS9tOYhb6laLR
+  bucketName: csams
+# 文件存储配置
+file:
+  upload:
+    #    path: ./file
+    path: file
+  max-size: 10MB
+allowed:
+  types: jpg,png,pdf
+############## openapi 配置 (文档: ) ##############
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+#  mapper-locations: classpath*:mapper/**/*.xml
+#  configuration:
+#server:
+#  servlet:
+#    context-path: /csams
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# 强制响应编码
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true

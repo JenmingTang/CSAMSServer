@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.csamsserver.mapper.PermissionMapper">
+
+    <resultMap id="BaseResultMap" type="com.future.csamsserver.domain.Permission">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="permCode" column="perm_code" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,perm_code,description,
+        create_time,update_time
+    </sql>
+
+    <select id="selectPermissionCodeByUserId" resultType="java.lang.String">
+        select p.perm_code
+        from permission p
+                 left join role_permission rp on p.id = rp.perm_id
+                 left join user_role ur on rp.role_id = ur.role_id
+        where ur.user_id = #{userId}
+    </select>
+    <select id="selectPermissionListByParams" resultType="com.future.csamsserver.domain.Permission">
+        select
+        <include refid="Base_Column_List"/>
+        from permission
+        <where>
+            <if test="permCode != null and permCode != ''">
+                and perm_code like concat('%', #{permCode}, '%')
+            </if>
+            <if test="description != null and description != ''">
+                and description like concat('%', #{description}, '%')
+            </if>
+            <if test="createTimeStart != null">
+                and create_time &gt;= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time &lt;= #{createTimeEnd}
+            </if>
+        </where>
+        <if test="current != null and size != null">
+            ORDER BY id DESC
+            LIMIT #{size} OFFSET #{current}
+        </if>
+        <if test="current == null or size == null">
+            ORDER BY id DESC
+        </if>
+    </select>
+    <select id="selectPermissionIdListByRoleId" resultType="java.lang.Long">
+            select perm_id
+            from role_permission
+            where role_id = #{roleId}
+    </select>
+</mapper>
