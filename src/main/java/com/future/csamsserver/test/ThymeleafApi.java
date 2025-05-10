@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
  * @dateTime 2025:03:26 17:17
  * @user Jenming
  */
-public class ThymeleafTemplate {
+public class ThymeleafApi {
     public static void main(String[] args) {
         /*
         * <!-- 错误示例：不能直接写 Java 代码 -->

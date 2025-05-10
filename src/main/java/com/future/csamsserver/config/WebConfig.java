@@ -1,9 +1,11 @@
 package com.future.csamsserver.config;
 
+import com.future.csamsserver.interceptor.ViewCountInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.EncodedResourceResolver;
@@ -23,9 +25,18 @@ import java.util.concurrent.TimeUnit;
 public class WebConfig implements WebMvcConfigurer {
 
 
+    private final ViewCountInterceptor viewCountInterceptor;
     @Value("${file.upload.path}")
     private String uploadPath;
 
+    public WebConfig(ViewCountInterceptor viewCountInterceptor) {
+        this.viewCountInterceptor = viewCountInterceptor;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(viewCountInterceptor).addPathPatterns("/**");
+    }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         Path uploadDir = Paths.get(System.getProperty("user.dir"), uploadPath)

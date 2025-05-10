@@ -110,6 +110,9 @@ http://localhost:8080/view_club/images4/0.jpg
         final List<Activity> activityList = activityMapper.selectList(activityLambdaQueryWrapper);
 
 //        final LocalFile showPressRelease = localFileMapper.selectOne(wrapper2);
+        /*
+        * todo 每一个社团都必须要有展示新闻稿
+        * */
         final LocalFile showPressRelease = getLocalFileList(clubId, TargetTypeEnum.CLUB, FileCategoryEnum.SHOW_PRESS_RELEASE).get(0);
         final List<LocalFile> pressReleaseList = getLocalFileList(clubId, TargetTypeEnum.CLUB, FileCategoryEnum.PRESS_RELEASE);
 
