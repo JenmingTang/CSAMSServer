@@ -177,6 +177,9 @@
 
     <build>
         <plugins>
+            <!--
+            打包执行Maven Lifecycle Phases，默认执行clean、verify、install三个Phase，
+            -->
             <!--            <plugin>-->
             <!--                <groupId>org.apache.maven.plugins</groupId>-->
             <!--                <artifactId>maven-compiler-plugin</artifactId>-->
@@ -205,6 +208,23 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!--
+            不行
+            D:\CSAMS\server-preview>java -jar CSAMSServer-0.0.1-SNAPSHOT.jar
+Error: Could not find or load main class com.future.csamsserver.CsamsServerApplication
+Caused by: java.lang.ClassNotFoundException: com.future.csamsserver.CsamsServerApplication
+            -->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-jar-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <archive>-->
+<!--                        <manifest>-->
+<!--                            <mainClass>com.future.csamsserver.CsamsServerApplication</mainClass>-->
+<!--                        </manifest>-->
+<!--                    </archive>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
